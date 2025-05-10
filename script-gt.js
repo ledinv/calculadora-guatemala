@@ -4,8 +4,6 @@ function calcular() {
   const grua = parseFloat(document.getElementById("c8").value);
   const tipoCambio = parseFloat(document.getElementById("e2").value);
   const anio = parseInt(document.getElementById("anio").value);
-  const titulo = document.getElementById("titulo").value;
-  const tipoVehiculo = document.getElementById("tipoVehiculo").value;
   const aduanero = parseFloat(document.getElementById("aduanero").value || 0);
 
   if (!oferta || !flete || !grua || !tipoCambio || !anio) {
