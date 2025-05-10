@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Guatemala – SubastaCar</title>
+  <meta name="description" content="Calculadora gratuita de importación de vehículos a Guatemala. Calculá impuestos como IVA e IPRIMA desde subastas como Copart o IAA.">
+  <link rel="stylesheet" href="estilos-gt.css">
+</head>
+<body>
+
+<header>
+  <h1>Calculadora de Importación – Guatemala</h1>
+</header>
+
+<main>
+  <section class="formulario">
+    <label for="c1">Monto de Oferta (USD):</label>
+    <input type="number" id="c1" />
+
+    <label for="c7">Precio de Barco / Flete (USD):</label>
+    <input type="number" id="c7" />
+
+    <label for="c8">Precio de Grúa (USD):</label>
+    <input type="number" id="c8" />
+
+    <label for="e2">Tipo de Cambio (USD a GTQ):</label>
+    <input type="number" id="e2" value="7.8" />
+
+    <label for="anio">Año del Vehículo:</label>
+    <input type="number" id="anio" min="1990" max="2025" />
+
+    <label for="titulo">Tipo de Título:</label>
+    <select id="titulo">
+      <option value="clean">Clean</option>
+      <option value="salvage">Salvage</option>
+      <option value="rebuilt">Rebuilt</option>
+    </select>
+
+    <label for="tipoVehiculo">Tipo de Vehículo:</label>
+    <select id="tipoVehiculo">
+      <option value="turismo">Turismo</option>
+      <option value="pickup">Pickup</option>
+      <option value="suv">SUV</option>
+      <option value="electrico">Eléctrico</option>
+    </select>
+
+    <div style="margin-top: 10px;">
+      <button onclick="calcular()">Calcular</button>
+      <button onclick="reiniciar()">Reiniciar</button>
+    </div>
+  </section>
+
+  <section class="resultados" id="resultados">
+    <!-- Aquí se mostrarán los resultados -->
+  </section>
+</main>
+
+<script src="script-gt.js"></script>
+</body>
+</html>
