@@ -1,9 +1,9 @@
 :root {
-  --blue: #002f6c;
-  --blue2: #004aad;
-  --yellow: #ffc20e;
-  --gray: #f9f9f9;
-  --dark: #333;
+  --celeste: #4997D0;
+  --celeste-claro: #eaf4fb;
+  --blanco: #ffffff;
+  --dorado: #c9a43e;
+  --gris: #f0f0f0;
   --max-width: 800px;
 }
 
@@ -15,62 +15,81 @@
 
 body {
   font-family: 'Montserrat', sans-serif;
-  background: var(--gray);
-  color: var(--dark);
-  line-height: 1.5;
+  background: var(--celeste-claro);
+  color: #333;
   padding: 20px;
 }
 
 header {
-  background: linear-gradient(to right, var(--blue), var(--blue2));
-  color: white;
+  background: var(--celeste);
+  color: var(--blanco);
   text-align: center;
   padding: 1rem;
   border-radius: 10px;
+  position: relative;
   margin-bottom: 20px;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  margin-top: 5px;
+}
+
+header .escudo {
+  position: absolute;
+  left: 15px;
+  top: 10px;
+  width: 50px;
+  height: auto;
 }
 
 main {
   max-width: var(--max-width);
-  margin: 0 auto;
-  background: white;
+  margin: auto;
+  background: var(--blanco);
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .formulario label {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   font-weight: 600;
-  color: var(--blue);
+  color: var(--celeste);
+  margin-top: 10px;
 }
 
 .formulario input,
 .formulario select {
   width: 100%;
-  padding: 8px;
+  padding: 6px;
+  margin-bottom: 10px;
+  border: 1px solid var(--celeste);
+  border-radius: 8px;
+  background: var(--celeste-claro);
   font-size: 1rem;
-  margin-top: 4px;
-  border: 1px solid var(--blue2);
-  border-radius: 8px;
-  background: #eef4ff;
 }
 
-.formulario button {
-  background-color: var(--yellow);
-  color: var(--blue);
-  font-weight: bold;
+.botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.botones button {
+  background-color: var(--dorado);
+  color: var(--blanco);
   border: none;
-  border-radius: 8px;
   padding: 10px 16px;
-  margin: 10px 8px 0 0;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
 }
 
-.formulario button:hover {
-  background-color: #e6ac00;
+.botones button:hover {
+  background-color: #b5902c;
 }
 
 .resultados {
@@ -80,17 +99,19 @@ main {
 .resultados table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 12px;
+  background: var(--blanco);
 }
 
 .resultados th,
 .resultados td {
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #ccc;
   text-align: left;
+  font-size: 0.95rem;
 }
 
 .resultados th {
-  background: #f0f8ff;
-  color: var(--blue2);
+  background: var(--celeste);
+  color: var(--blanco);
 }
