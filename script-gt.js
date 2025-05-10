@@ -6,6 +6,7 @@ function calcular() {
   const anio = parseInt(document.getElementById("anio").value);
   const titulo = document.getElementById("titulo").value;
   const tipoVehiculo = document.getElementById("tipoVehiculo").value;
+  const aduanero = parseFloat(document.getElementById("aduanero").value || 0);
 
   if (!oferta || !flete || !grua || !tipoCambio || !anio) {
     alert("Por favor, completa todos los campos.");
@@ -44,10 +45,23 @@ function calcular() {
   const iprima = cifGTQ * iprimaTasa;
 
   const totalImpuestos = iva + iprima;
-  const totalFinal = cifGTQ + totalImpuestos;
+  const totalImportacion = cifGTQ + totalImpuestos;
+
+  // Gastos fijos adicionales en GTQ
+  const transferencia = 250;
+  const escaneoAlmacenaje = 400;
+  const placas = 120;
+  const tarjeta = 75;
+  const tituloGuate = 50;
+  const otros = 100;
+
+  const gastosFijos = transferencia + escaneoAlmacenaje + placas + tarjeta + tituloGuate + otros;
+
+  const totalFinalGeneral = totalImportacion + gastosFijos + aduanero;
 
   mostrarResultados({
-    facturaCopart, seguro, cifGTQ, iva, iprima, totalImpuestos, totalFinal, tipoCambio
+    facturaCopart, seguro, cifGTQ, iva, iprima, totalImpuestos, totalImportacion,
+    gastosFijos, aduanero, totalFinalGeneral, tipoCambio
   });
 }
 
@@ -83,7 +97,8 @@ function buscarVirtualBidFee(oferta) {
 // Mostrar resultados
 function mostrarResultados(datos) {
   const {
-    facturaCopart, seguro, cifGTQ, iva, iprima, totalImpuestos, totalFinal, tipoCambio
+    facturaCopart, seguro, cifGTQ, iva, iprima, totalImpuestos, totalImportacion,
+    gastosFijos, aduanero, totalFinalGeneral, tipoCambio
   } = datos;
 
   const formatear = v => new Intl.NumberFormat("es-GT", {
@@ -104,7 +119,10 @@ function mostrarResultados(datos) {
       <tr><td>IVA (12%)</td><td>${formatear(iva)}</td></tr>
       <tr><td>IPRIMA</td><td>${formatear(iprima)}</td></tr>
       <tr><td>Total de Impuestos</td><td>${formatear(totalImpuestos)}</td></tr>
-      <tr><td><strong>Total Final Estimado</strong></td><td><strong>${formatear(totalFinal)}</strong></td></tr>
+      <tr><td>Total Importación + Impuestos</td><td>${formatear(totalImportacion)}</td></tr>
+      <tr><td>Gastos Fijos Estimados</td><td>${formatear(gastosFijos)}</td></tr>
+      <tr><td>Agente Aduanero</td><td>${formatear(aduanero)}</td></tr>
+      <tr><th>Total Final Estimado</th><th>${formatear(totalFinalGeneral)}</th></tr>
     </table>
     <p style="margin-top:10px;">Tipo de cambio aplicado: ${tipoCambio}</p>
   `;
@@ -120,5 +138,6 @@ function reiniciar() {
   document.getElementById("anio").value = "";
   document.getElementById("titulo").value = "clean";
   document.getElementById("tipoVehiculo").value = "turismo";
+  document.getElementById("aduanero").value = "";
   document.getElementById("resultados").innerHTML = "";
 }
