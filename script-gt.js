@@ -18,7 +18,6 @@ function calcular() {
   const gateFee = 115;
   const virtualBidFee = buscarVirtualBidFee(oferta);
   const buyerFee = buscarBuyerFee(oferta);
-
   const facturaCopart = oferta + environmentalFee + virtualBidFee + buyerFee + gateFee;
 
   // Seguro marítimo (1.5% de factura Copart)
@@ -33,39 +32,37 @@ function calcular() {
   // IVA 12%
   const iva = cifGTQ * 0.12;
 
-  // IPRIMA según antigüedad
+  // IPRIMA
   const anioActual = new Date().getFullYear();
   const antiguedad = anioActual - anio;
-
   let iprimaTasa = 0.2;
   if (antiguedad >= 3 && antiguedad <= 4) iprimaTasa = 0.15;
   else if (antiguedad >= 5 && antiguedad <= 6) iprimaTasa = 0.10;
   else if (antiguedad >= 7) iprimaTasa = 0.05;
-
   const iprima = cifGTQ * iprimaTasa;
-
   const totalImpuestos = iva + iprima;
-  const totalImportacion = cifGTQ + totalImpuestos;
 
-  // Gastos fijos adicionales en GTQ
-  const transferencia = 250;
-  const escaneoAlmacenaje = 400;
-  const placas = 120;
-  const tarjeta = 75;
-  const tituloGuate = 50;
-  const otros = 100;
+  // Gastos fijos
+  const gastos = {
+    transferencia: 250,
+    escaneo: 400,
+    placas: 120,
+    tarjeta: 75,
+    titulo: 50,
+    otros: 100
+  };
 
-  const gastosFijos = transferencia + escaneoAlmacenaje + placas + tarjeta + tituloGuate + otros;
+  const totalGastosFijos = gastos.transferencia + gastos.escaneo + gastos.placas + gastos.tarjeta + gastos.titulo + gastos.otros;
 
-  const totalFinalGeneral = totalImportacion + gastosFijos + aduanero;
+  const totalFinal = cifGTQ + totalImpuestos + totalGastosFijos + aduanero;
 
   mostrarResultados({
-    facturaCopart, seguro, cifGTQ, iva, iprima, totalImpuestos, totalImportacion,
-    gastosFijos, aduanero, totalFinalGeneral, tipoCambio
+    oferta, environmentalFee, virtualBidFee, buyerFee, gateFee,
+    facturaCopart, flete, grua, seguro, cifUSD, cifGTQ,
+    iva, iprima, totalImpuestos, gastos, aduanero, totalGastosFijos, totalFinal, tipoCambio
   });
 }
 
-// Tablas
 const buyerFees = [
   [50,1],[100,25],[200,60],[300,85],[350,100],[400,125],[450,135],[500,145],[550,155],[600,170],[700,195],
   [800,215],[900,230],[1000,250],[1200,270],[1300,285],[1400,300],[1500,315],[1600,330],[1700,350],[1800,370],[2000,390],
@@ -94,40 +91,48 @@ function buscarVirtualBidFee(oferta) {
   return oferta > 8000 ? 160 : buscarValor(virtualBidFees, oferta);
 }
 
-// Mostrar resultados
-function mostrarResultados(datos) {
-  const {
-    facturaCopart, seguro, cifGTQ, iva, iprima, totalImpuestos, totalImportacion,
-    gastosFijos, aduanero, totalFinalGeneral, tipoCambio
-  } = datos;
+function mostrarResultados(data) {
+  const f = v => new Intl.NumberFormat("es-GT", { style: "currency", currency: "GTQ" }).format(v);
+  const fUSD = v => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
 
-  const formatear = v => new Intl.NumberFormat("es-GT", {
-    style: "currency", currency: "GTQ"
-  }).format(v);
-
-  const formatearUSD = v => new Intl.NumberFormat("en-US", {
-    style: "currency", currency: "USD"
-  }).format(v);
-
-  const html = `
-    <h2>Resultados</h2>
+  document.getElementById("resultados").innerHTML = `
+    <h2>Resultados Detallados</h2>
     <table>
-      <tr><th>Concepto</th><th>Valor</th></tr>
-      <tr><td>Factura Copart</td><td>${formatearUSD(facturaCopart)}</td></tr>
-      <tr><td>Seguro Marítimo (1.5%)</td><td>${formatearUSD(seguro)}</td></tr>
-      <tr><td>Valor CIF en GTQ</td><td>${formatear(cifGTQ)}</td></tr>
-      <tr><td>IVA (12%)</td><td>${formatear(iva)}</td></tr>
-      <tr><td>IPRIMA</td><td>${formatear(iprima)}</td></tr>
-      <tr><td>Total de Impuestos</td><td>${formatear(totalImpuestos)}</td></tr>
-      <tr><td>Total Importación + Impuestos</td><td>${formatear(totalImportacion)}</td></tr>
-      <tr><td>Gastos Fijos Estimados</td><td>${formatear(gastosFijos)}</td></tr>
-      <tr><td>Agente Aduanero</td><td>${formatear(aduanero)}</td></tr>
-      <tr><th>Total Final Estimado</th><th>${formatear(totalFinalGeneral)}</th></tr>
-    </table>
-    <p style="margin-top:10px;">Tipo de cambio aplicado: ${tipoCambio}</p>
-  `;
+      <tr><th colspan="2">🧾 Factura Copart</th></tr>
+      <tr><td>Monto de Oferta</td><td>${fUSD(data.oferta)}</td></tr>
+      <tr><td>Environmental Fee</td><td>${fUSD(data.environmentalFee)}</td></tr>
+      <tr><td>Virtual Bid Fee</td><td>${fUSD(data.virtualBidFee)}</td></tr>
+      <tr><td>Buyer Fee</td><td>${fUSD(data.buyerFee)}</td></tr>
+      <tr><td>Gate Fee</td><td>${fUSD(data.gateFee)}</td></tr>
+      <tr><td><strong>Total Factura Copart</strong></td><td><strong>${fUSD(data.facturaCopart)}</strong></td></tr>
 
-  document.getElementById("resultados").innerHTML = html;
+      <tr><th colspan="2">🚢 Transporte y Seguro</th></tr>
+      <tr><td>Precio de Barco</td><td>${fUSD(data.flete)}</td></tr>
+      <tr><td>Precio de Grúa</td><td>${fUSD(data.grua)}</td></tr>
+      <tr><td>Seguro (1.5%)</td><td>${fUSD(data.seguro)}</td></tr>
+      <tr><td>Total CIF (USD)</td><td>${fUSD(data.cifUSD)}</td></tr>
+      <tr><td>Total CIF (GTQ)</td><td>${f(data.cifGTQ)}</td></tr>
+
+      <tr><th colspan="2">💸 Impuestos</th></tr>
+      <tr><td>IVA (12%)</td><td>${f(data.iva)}</td></tr>
+      <tr><td>IPRIMA</td><td>${f(data.iprima)}</td></tr>
+      <tr><td><strong>Total Impuestos</strong></td><td><strong>${f(data.totalImpuestos)}</strong></td></tr>
+
+      <tr><th colspan="2">🔧 Gastos Fijos</th></tr>
+      <tr><td>Transferencia Internacional</td><td>${f(data.gastos.transferencia)}</td></tr>
+      <tr><td>Escaneo y Almacenaje</td><td>${f(data.gastos.escaneo)}</td></tr>
+      <tr><td>Placas</td><td>${f(data.gastos.placas)}</td></tr>
+      <tr><td>Tarjeta de Circulación</td><td>${f(data.gastos.tarjeta)}</td></tr>
+      <tr><td>Título Guatemalteco</td><td>${f(data.gastos.titulo)}</td></tr>
+      <tr><td>Otros (gestoría, formularios)</td><td>${f(data.gastos.otros)}</td></tr>
+      <tr><td><strong>Total Gastos Fijos</strong></td><td><strong>${f(data.totalGastosFijos)}</strong></td></tr>
+
+      <tr><td>Agente Aduanero</td><td>${f(data.aduanero)}</td></tr>
+
+      <tr><th>Total Final</th><th>${f(data.totalFinal)}</th></tr>
+    </table>
+    <p style="margin-top: 12px;">Tipo de cambio aplicado: <strong>${data.tipoCambio}</strong></p>
+  `;
 }
 
 function reiniciar() {
