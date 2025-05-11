@@ -147,8 +147,8 @@ function calcular() {
           dai = base * 0.05;
         }
       }
-      // ISC
-      if (tipo!=='AGRICOLA') {
+      // ISC: Exento para vehículos de trabajo
+      if (!['PICKUP','CAMION'].includes(tipo) && tipo!=='AGRICOLA') {
         if (tipo==='MOTO') {
           isc = base * 0.10;
         } else {
@@ -210,19 +210,13 @@ function calcular() {
 
   mostrarResultados(detalles);
   guardarHistorial(
-    detalles.map(([titulo, valor, tipo]) => ({
-      titulo,
-      valor: tipo==='usd'?formatearUSD(valor):formatear(valor)
-    })),
+    detalles.map(([titulo, valor, tipo]) => ({ titulo, valor: tipo==='usd'?formatearUSD(valor):formatear(valor) })),
     formatear(totalFinal)
   );
 }
 
-// Renderizado y utilidades
 function mostrarResultados(detalles) {
-  const html = detalles.map(([t,v,tp])=>`
-    <tr><td>${t}</td><td>${tp==='usd'?formatearUSD(v):formatear(v)}</td></tr>
-  `).join('');
+  const html = detalles.map(([t,v,tp])=>`<tr><td>${t}</td><td>${tp==='usd'?formatearUSD(v):formatear(v)}</td></tr>`).join('');
   document.getElementById('results').innerHTML = `
     <div style="text-align:center;">
       <p><strong>Total Final:</strong> ${formatear(detalles.slice(-1)[0][1])}</p>
@@ -237,49 +231,36 @@ function mostrarResultados(detalles) {
     </div>
   `;
 }
+
 function mostrarDetalles() {
-  const det = document.getElementById('detalleResultados'),
-        btn = document.getElementById('toggleBtn'),
-        show = det.style.display==='block';
-  det.style.display = show?'none':'block';
-  btn.textContent = show?'Ver detalles':'Ocultar detalles';
+  const det = document.getElementById('detalleResultados'), btn = document.getElementById('toggleBtn'), show = det.style.display==='block';
+  det.style.display = show?'none':'block'; btn.textContent = show?'Ver detalles':'Ocultar detalles';
 }
+
 function descargarPDF() {
-  const det = document.getElementById('detalleResultados');
-  if(det.style.display==='none') mostrarDetalles();
-  const content = document.getElementById('results').innerHTML,
-        w = window.open('','_blank','width=800,height=600');
-  w.document.write(`<html><head><title>PDF</title><style>
-    body{font-family:Helvetica;margin:20px;} .tabla-detalles{margin:20px auto;border-collapse:collapse;width:100%;max-width:600px;}
-    .tabla-detalles th,.tabla-detalles td{padding:8px 12px;border:1px solid #ddd;}
-    .tabla-detalles th{background:#f2f2f2;} th:first-child,td:first-child{text-align:left;} th:last-child,td:last-child{text-align:right;}
-  </style></head><body>${content}</body></html>`);
-  w.document.close();
-  setTimeout(()=>w.print(),500);
+  const det = document.getElementById('detalleResultados'); if(det.style.display==='none') mostrarDetalles();
+  const content = document.getElementById('results').innerHTML, w = window.open('','_blank','width=800,height=600');
+  w.document.write(`<html><head><title>PDF</title><style>body{font-family:Helvetica;margin:20px;} .tabla-detalles{margin:20px auto;border-collapse:collapse;width:100%;max-width:600px;} .tabla-detalles th,.tabla-detalles td{padding:8px 12px;border:1px solid #ddd;} .tabla-detalles th{background:#f2f2f2;} th:first-child,td:first-child{text-align:left;} th:last-child,td:last-child{text-align:right;}</style></head><body>${content}</body></html>`);
+  w.document.close(); setTimeout(()=>w.print(),500);
 }
+
 function compartirWhatsApp() {
   let txt="¡Hola! Cálculo de importación:\n\n";
-  document.querySelectorAll('#detalleResultados table tr').forEach(r=>{
-    const c=r.querySelectorAll('td,th');
-    if(c.length===2) txt+=`${c[0].innerText}: ${c[1].innerText}\n`;
-  });
+  document.querySelectorAll('#detalleResultados table tr').forEach(r=>{const c=r.querySelectorAll('td,th'); if(c.length===2) txt+=`${c[0].innerText}: ${c[1].innerText}\n`;});
   window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');
 }
+
 function reiniciar() {
-  ['c1','c7','c8','e2','vin','tipoVehiculo','año','motor'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el.tagName==='SELECT') el.selectedIndex=0;
-    else el.value = id==='e2'?'25.90':'';
-  });
-  document.getElementById('hibrido').value='no';
-  document.getElementById('results').innerHTML='';
+  ['c1','c7','c8','e2','vin','tipoVehiculo','año','motor'].forEach(id=>{const el=document.getElementById(id); if(el.tagName==='SELECT') el.selectedIndex=0; else el.value=id==='e2'?'25.90':'';});
+  document.getElementById('hibrido').value='no'; document.getElementById('results').innerHTML='';
 }
+
 async function guardarHistorial(detalles, total) {
-  const user=auth.currentUser; if(!user)return;
+  const user=auth.currentUser; if(!user) return;
   try {
     const ref=db.collection('clients').doc(user.uid).collection('historial');
     const snap=await ref.orderBy('fecha','desc').get();
     if(snap.size>=100) await ref.doc(snap.docs.pop().id).delete();
-    await ref.add({nombre:'Sin título',fecha:firebase.firestore.FieldValue.serverTimestamp(),detalles,total});
-  } catch(e){console.error('Error guardando historial:',e);}
+    await ref.add({ nombre:'Sin título', fecha:firebase.firestore.FieldValue.serverTimestamp(), detalles, total });
+  } catch(e) { console.error('Error guardando historial:', e); }
 }
