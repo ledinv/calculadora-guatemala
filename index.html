@@ -2,49 +2,143 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora Guatemala – SubastaCar</title>
-  <meta name="description" content="Calculadora de importación de vehículos a Guatemala. IVA, IPRIMA, CIF y más.">
-  <link rel="stylesheet" href="estilos-gt.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora – SubastaCarHN</title>
+
+  <!-- Íconos y colores -->
+  <link rel="manifest" href="Img/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="Img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="Img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="Img/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="Img/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="Img/android-chrome-512x512.png">
+  <meta name="theme-color" content="#002f6c">
+
+  <!-- Fuentes y estilos -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="estilos.css">
 </head>
+
 <body>
 
-<header>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Escudo_de_Guatemala.svg" alt="Escudo de Guatemala" class="escudo">
-  <h1>Calculadora de Importación – Guatemala</h1>
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">SubastaCarHN</a>
+    <nav class="nav-links">
+      <a href="calculadora.html">Calculadora</a>
+      <a href="cursos.html">Cursos</a>
+      <a href="inventario.html">Vehículos</a>
+      <a href="https://wa.me/50497330137" target="_blank">Soporte</a>
+      <span id="userGreeting"></span>
+      <span id="contadorClics"></span>
+    </nav>
+    <button class="menu-icon" onclick="toggleMenu()">☰</button>
+  </div>
+  <ul id="mobile-menu-links" class="mobile-nav">
+    <li><a href="calculadora.html">Calculadora</a></li>
+    <li><a href="cursos.html">Cursos</a></li>
+    <li><a href="inventario.html">Vehículos</a></li>
+    <li><a href="https://wa.me/50497330137" target="_blank">Soporte</a></li>
+    <li><span id="mobileGreeting"></span></li>
+  </ul>
 </header>
 
-<main class="grid">
-  <section class="formulario">
-    <label for="c1">Monto de Oferta (USD):</label>
-    <input type="number" id="c1" />
+<!-- CONTENIDO PRINCIPAL -->
+<div id="content" style="display:none;">
 
-    <label for="c7">Precio de Barco / Flete (USD):</label>
-    <input type="number" id="c7" />
+  <h1 class="titulo">Calculadora de Importación de Vehículos</h1>
 
-    <label for="c8">Precio de Grúa (USD):</label>
-    <input type="number" id="c8" />
+  <p class="soporte">
+    ¿Necesitás ayuda? <a href="https://wa.me/50497330137" target="_blank">Soporte gratuito</a> al
+    <span style="color:green;">+504 9733-0137</span>
+  </p>
 
-    <label for="e2">Tipo de Cambio (USD a GTQ):</label>
-    <input type="number" id="e2" value="7.8" />
-
-    <label for="anio">Año del Vehículo:</label>
-    <input type="number" id="anio" min="1990" max="2025" />
-
-    <label for="aduanero">Costo de Agente Aduanero (GTQ):</label>
-    <input type="number" id="aduanero" />
-
-    <div class="botones">
-      <button onclick="calcular()">Calcular</button>
-      <button onclick="reiniciar()">Reiniciar</button>
+  <div class="layout">
+    <div class="banner izquierda">
+      <img src="https://raw.githubusercontent.com/ledinv/calculadora-subastacarhn/main/lateral%20izquierdo.jpeg" alt="Banner Izquierdo">
     </div>
-  </section>
 
-  <section class="resultados" id="resultados">
-    <!-- Aquí se mostrará la tabla -->
-  </section>
-</main>
+    <!-- FORMULARIO -->
+    <div class="contenido-central">
+      <label for="c1">Monto de Oferta $:</label>
+      <input type="number" id="c1" />
 
-<script src="script-gt.js"></script>
+      <label for="c7">Precio de Barco $:</label>
+      <input type="number" id="c7" />
+
+      <label for="c8">Precio de Grúa $:</label>
+      <input type="number" id="c8" />
+
+      <label for="e2">Tipo de Cambio:</label>
+      <input type="number" id="e2" value="25.90" readonly />
+
+      <label for="vin">VIN:</label>
+      <select id="vin">
+        <option value="otros" selected>Otros</option>
+        <option value="145">1, 4 o 5</option>
+      </select>
+
+      <label for="tipoVehiculo">Tipo de Vehículo:</label>
+      <select id="tipoVehiculo">
+        <option value="TURISMO">Turismo</option>
+        <option value="PICKUP">Pick-Up</option>
+        <option value="MOTO">Motocicleta</option>
+        <option value="CAMION">Camión</option>
+        <option value="AGRICOLA">Maquinaria Agrícola</option>
+      </select>
+
+      <label for="año">Año del Vehículo:</label>
+      <select id="año">
+        <option value="2005">2005 o menor</option>
+        <option value="2006">2006 o mayor</option>
+      </select>
+
+      <label for="motor">Cilindraje:</label>
+      <select id="motor">
+        <option value="">Seleccionar...</option>
+        <option value="1.5 Inferior">1.5 Inferior</option>
+        <option value="Superior 1.5">Superior a 1.5</option>
+      </select>
+
+      <button class="styled-btn" onclick="calcular()">Calcular</button>
+      <button class="styled-btn" onclick="reiniciar()">Reiniciar</button>
+    </div>
+
+    <div class="banner derecha">
+      <img src="https://raw.githubusercontent.com/ledinv/calculadora-subastacarhn/main/lateral%20derecho.jpg" alt="Banner Derecho">
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+  <a href="https://wa.me/50497330137" class="soporte-gratis" target="_blank">Cotízalo ya</a>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <nav class="footer-nav">
+      <ul class="footer-list">
+        <li><a href="calculadora.html">Calculadora</a></li>
+        <li><a href="inventario.html">Vehículos</a></li>
+        <li><a href="cursos.html">Cursos</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="social-links">
+      <a href="https://www.facebook.com/people/Subasta-Car-HN/100090605243085/" target="_blank">Facebook</a> |
+      <a href="https://www.instagram.com/subastacar1/" target="_blank">Instagram</a> |
+      <a href="https://www.tiktok.com/@tu_amigo_el_importador" target="_blank">TikTok</a>
+    </div>
+    <div class="footer-copy">&copy; 2025 SubastaCarHN. Todos los derechos reservados.</div>
+  </div>
+</footer>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<!-- Script principal -->
+<script src="script.js"></script>
 </body>
 </html>
