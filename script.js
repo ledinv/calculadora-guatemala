@@ -11,7 +11,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-
+/*
 // Mostrar saludo si el usuario está logueado
 auth.onAuthStateChanged(user => {
   const content = document.getElementById('content');
@@ -29,6 +29,12 @@ auth.onAuthStateChanged(user => {
     alert('❗ Debes iniciar sesión para usar la calculadora.');
     window.location.href = 'login.html';
   }
+});
+*/
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("content").style.display = "block";
+  obtenerTipoCambioAutomatico();
+  obtenerContador();
 });
 
 function logout() {
