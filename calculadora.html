@@ -83,7 +83,7 @@
         <option value="TURISMO">Turismo</option>
         <option value="PICKUP">Pick-Up</option>
         <option value="MOTO">Motocicleta</option>
-        <option value="CAMION">Camión</option>
+        <option value="CAMION">Camíon</option>
         <option value="AGRICOLA">Maquinaria Agrícola</option>
       </select>
 
@@ -93,12 +93,20 @@
         <option value="2006">2006 o mayor</option>
       </select>
 
-      <label for="motor">Cilindraje:</label>
-      <select id="motor">
-        <option value="">Seleccionar...</option>
-        <option value="1.5 Inferior">1.5 Inferior</option>
-        <option value="Superior 1.5">Superior a 1.5</option>
+      <label for="hibrido">Vehículo Híbrido:</label>
+      <select id="hibrido" onchange="ocultarMotorSiHibrido()">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
       </select>
+
+      <div id="grupoMotor">
+        <label for="motor">Cilindraje:</label>
+        <select id="motor">
+          <option value="">Seleccionar...</option>
+          <option value="1.5 Inferior">1.5 Inferior</option>
+          <option value="Superior 1.5">Superior a 1.5</option>
+        </select>
+      </div>
 
       <button class="styled-btn" onclick="calcular()">Calcular</button>
       <button class="styled-btn" onclick="reiniciar()">Reiniciar</button>
