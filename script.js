@@ -5,33 +5,33 @@ const firebaseConfig = {
   projectId: "subastacarhn-40554",
   storageBucket: "subastacarhn-40554.appspot.com",
   messagingSenderId: "536785797974",
-  appId: "1:536785797974:web=e3eabb4dcd898c2ffe8cf7",
+  appId: "1:536785797974:web:e3eabb4dcd898c2ffe8cf7",
   measurementId: "G-QM5N60K8C0"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Funciones auxiliares y tablas de fees
+// Formateadores de moneda
 const formatear = v =>
   new Intl.NumberFormat("es-HN", { style: "currency", currency: "HNL" }).format(v);
 const formatearUSD = v =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
 
+// Tablas de fees (copart idénticas)
 const buyerFees = [
-  [50, 1], [100, 25], [200, 60], [300, 85], [350, 100], [400, 125], [450, 135], [500, 145],
-  [550, 155], [600, 170], [700, 195], [800, 215], [900, 230], [1000, 250], [1200, 270],
-  [1300, 285], [1400, 300], [1500, 315], [1600, 330], [1700, 350], [1800, 370], [2000, 390],
-  [2400, 425], [2500, 460], [3000, 505], [3500, 555], [4000, 600], [4500, 625], [5000, 650],
-  [5500, 675], [6000, 700], [7000, 755], [7500, 775], [8000, 800], [8500, 820], [9000, 820],
-  [10000, 850], [11000, 850], [11500, 860], [12000, 875], [12500, 890], [13000, 890],
-  [14000, 900], [15000, 900]
+  [50,1],[100,25],[200,60],[300,85],[350,100],[400,125],[450,135],[500,145],
+  [550,155],[600,170],[700,195],[800,215],[900,230],[1000,250],[1200,270],
+  [1300,285],[1400,300],[1500,315],[1600,330],[1700,350],[1800,370],[2000,390],
+  [2400,425],[2500,460],[3000,505],[3500,555],[4000,600],[4500,625],[5000,650],
+  [5500,675],[6000,700],[7000,755],[7500,775],[8000,800],[8500,820],[9000,820],
+  [10000,850],[11000,850],[11500,860],[12000,875],[12500,890],[13000,890],
+  [14000,900],[15000,900]
 ];
 const virtualBidFees = [
-  [100, 50], [500, 65], [1000, 85], [1500, 95], [2000, 110], [4000, 125],
-  [6000, 145], [8000, 160], [9000, 160], [10000, 160], [200000, 160]
+  [100,50],[500,65],[1000,85],[1500,95],[2000,110],[4000,125],
+  [6000,145],[8000,160],[9000,160],[10000,160],[200000,160]
 ];
-
 function buscarValor(tabla, valor) {
   for (let i = tabla.length - 1; i >= 0; i--) {
     if (valor >= tabla[i][0]) return tabla[i][1];
@@ -43,27 +43,29 @@ const buscarBuyerFee = c1 =>
 const buscarVirtualBidFee = c1 =>
   c1 > 8000 ? 160 : buscarValor(virtualBidFees, c1);
 
-// Inicialización de la página
+// Mostrar la interfaz y configurar listeners
 document.addEventListener("DOMContentLoaded", () => {
+  // Mostrar contenido
   document.getElementById("content").style.display = "block";
+  // Tipo de cambio y contador
   obtenerTipoCambioAutomatico();
   obtenerContador();
-
-  // Mostrar u ocultar grupo de motor según híbrido
-  const hibridoSelect = document.getElementById("hibrido");
-  const motorGroup = document.getElementById("grupoMotor");
-  function toggleMotorGroup() {
-    if (hibridoSelect.value === "si") {
-      motorGroup.style.display = "none";
+  // Ocultar/mostrar motor si es híbrido
+  const hibrido = document.getElementById("hibrido");
+  const grupoMotor = document.getElementById("grupoMotor");
+  function actualizarMotor() {
+    if (hibrido.value === "si") {
+      grupoMotor.style.display = "none";
       document.getElementById("motor").value = "";
     } else {
-      motorGroup.style.display = "block";
+      grupoMotor.style.display = "block";
     }
   }
-  hibridoSelect.addEventListener("change", toggleMotorGroup);
-  toggleMotorGroup(); // aplicar al cargar
+  hibrido.addEventListener("change", actualizarMotor);
+  actualizarMotor();
 });
 
+// Funciones de sesión
 function logout() {
   firebase.auth().signOut().then(() => location.reload());
 }
@@ -71,12 +73,10 @@ function toggleMenu() {
   document.getElementById("mobile-menu-links").classList.toggle("open");
 }
 
-// Obtener tipo de cambio automático
+// Obtener tipo de cambio BCH
 async function obtenerTipoCambioAutomatico() {
   try {
-    const res = await fetch(
-      "https://subastacar-bch-api.onrender.com/api/tipo-cambio-bch"
-    );
+    const res = await fetch("https://subastacar-bch-api.onrender.com/api/tipo-cambio-bch");
     const json = await res.json();
     if (json.valor) {
       const e2 = document.getElementById("e2");
@@ -112,7 +112,8 @@ async function registrarClic() {
 // Función principal de cálculo
 function calcular() {
   registrarClic();
-  // Leer valores de formulario
+
+  // Lectura de campos
   const c1 = parseFloat(document.getElementById("c1").value) || 0;
   const c7 = parseFloat(document.getElementById("c7").value) || 0;
   const c8 = parseFloat(document.getElementById("c8").value) || 0;
@@ -167,19 +168,12 @@ function calcular() {
     }
     // ISC exento para pick-ups, camiones y maquinaria agrícola
     if (!["PICKUP", "CAMION", "AGRICOLA"].includes(tipo)) {
-      if (tipo === "MOTO") {
-        isc = base * 0.10;
-      } else if (cifUSD <= 7000) {
-        isc = base * 0.10;
-      } else if (cifUSD <= 10000) {
-        isc = base * 0.15;
-      } else if (cifUSD <= 20000) {
-        isc = base * 0.20;
-      } else if (cifUSD <= 30000) {
-        isc = base * 0.30;
-      } else {
-        isc = base * 0.45;
-      }
+      if (tipo === "MOTO") isc = base * 0.10;
+      else if (cifUSD <= 7000) isc = base * 0.10;
+      else if (cifUSD <= 10000) isc = base * 0.15;
+      else if (cifUSD <= 20000) isc = base * 0.20;
+      else if (cifUSD <= 30000) isc = base * 0.30;
+      else isc = base * 0.45;
     }
   }
   // ISV exento para híbridos y maquinaria agrícola
@@ -199,13 +193,12 @@ function calcular() {
   const transferencia = 55 * e2;
   const matricula = !usaAmnistia && anio >= 2006 ? 4000 : 0;
   const fijoAmnistia = usaAmnistia ? 10000 : 0;
-  const gastosFijos =
-    fijoAmnistia + aduanero + votainer + transferencia + matricula + ecotasa;
+  const gastosFijos = fijoAmnistia + aduanero + votainer + transferencia + matricula + ecotasa;
 
   // Total final
   const totalFinal = cifHNL + dai + isc + isv + gastosFijos;
 
-  // Preparar detalles para mostrar y guardar
+  // Preparar detalles
   const detalles = [
     ["MONTO DE OFERTA", c1, "usd"],
     ["ENVIRONMENTAL FEE", environmentalFee, "usd"],
@@ -233,50 +226,35 @@ function calcular() {
 
   mostrarResultados(detalles);
   guardarHistorial(
-    detalles.map(([titulo, valor, unidad]) => ({
-      titulo,
-      valor: unidad === "usd" ? formatearUSD(valor) : formatear(valor)
+    detalles.map(([t, v, u]) => ({
+      titulo: t,
+      valor: u === "usd" ? formatearUSD(v) : formatear(v)
     })),
     formatear(totalFinal)
   );
 }
 
-// Funciones de renderizado y utilidades
+// Renderizado de resultados
 function mostrarResultados(detalles) {
   const rows = detalles
-    .map(
-      ([t, v, un]) =>
-        `<tr><td>${t}</td><td>${
-          un === "usd" ? formatearUSD(v) : formatear(v)
-        }</td></tr>`
-    )
+    .map(([t, v, u]) => `<tr><td>${t}</td><td>${u === "usd" ? formatearUSD(v) : formatear(v)}</td></tr>`)
     .join("");
   document.getElementById("results").innerHTML = `
     <div style="text-align:center;">
-      <p><strong>Total Final:</strong> ${formatear(
-        detalles.slice(-1)[0][1]
-      )}</p>
+      <p><strong>Total Final:</strong> ${formatear(detalles.slice(-1)[0][1])}</p>
       <div class="botones-detalle">
-        <button onclick="mostrarDetalles()" id="toggleBtn" class="styled-btn">
-          Ver detalles
-        </button>
-        <button onclick="descargarPDF()" class="styled-btn">
-          Descargar en PDF
-        </button>
-        <button onclick="compartirWhatsApp()" class="styled-btn">
-          Compartir por WhatsApp
-        </button>
+        <button onclick="mostrarDetalles()" id="toggleBtn" class="styled-btn">Ver detalles</button>
+        <button onclick="descargarPDF()" class="styled-btn">Descargar en PDF</button>
+        <button onclick="compartirWhatsApp()" class="styled-btn">Compartir por WhatsApp</button>
       </div>
       <div id="detalleResultados" style="display:none;">
         <table class="tabla-detalles">
-          <tr><th>Concepto</th><th>Valor</th></tr>
-          ${rows}
+          <tr><th>Concepto</th><th>Valor</th></tr>${rows}
         </table>
       </div>
     </div>
   `;
 }
-
 function mostrarDetalles() {
   const det = document.getElementById("detalleResultados");
   const btn = document.getElementById("toggleBtn");
@@ -284,72 +262,42 @@ function mostrarDetalles() {
   det.style.display = visible ? "none" : "block";
   btn.textContent = visible ? "Ver detalles" : "Ocultar detalles";
 }
-
 function descargarPDF() {
   mostrarDetalles();
   const content = document.getElementById("results").innerHTML;
   const w = window.open("", "_blank", "width=800,height=600");
-  w.document.write(`
-    <html>
-      <head>
-        <title>PDF</title>
-        <style>
-          body { font-family: Helvetica; margin: 20px; }
-          .tabla-detalles {
-            margin: 20px auto;
-            border-collapse: collapse;
-            width: 100%;
-            max-width: 600px;
-          }
-          .tabla-detalles th, .tabla-detalles td {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-          }
-          .tabla-detalles th { background: #f2f2f2; }
-        </style>
-      </head>
-      <body>${content}</body>
-    </html>
-  `);
+  w.document.write(`<html><head><title>PDF</title><style>
+    body{font-family:Helvetica;margin:20px;}
+    .tabla-detalles{margin:20px auto;border-collapse:collapse;width:100%;max-width:600px;}
+    .tabla-detalles th,.tabla-detalles td{padding:8px 12px;border:1px solid #ddd;}
+    .tabla-detalles th{background:#f2f2f2;}
+  </style></head><body>${content}</body></html>`);
   w.document.close();
   setTimeout(() => w.print(), 500);
 }
-
 function compartirWhatsApp() {
   let text = "¡Hola! Aquí tu cálculo de importación:\n\n";
-  document
-    .querySelectorAll("#detalleResultados table tr")
-    .forEach((row) => {
-      const cols = row.querySelectorAll("td, th");
-      if (cols.length === 2)
-        text += `${cols[0].innerText}: ${cols[1].innerText}\n`;
-    });
+  document.querySelectorAll("#detalleResultados table tr").forEach(row => {
+    const cols = row.querySelectorAll("td,th");
+    if (cols.length === 2) text += `${cols[0].innerText}: ${cols[1].innerText}\n`;
+  });
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 }
-
 function reiniciar() {
-  document.getElementById("c1").value = "";
-  document.getElementById("c7").value = "";
-  document.getElementById("c8").value = "";
+  ["c1","c7","c8"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("e2").value = "25.90";
-  document.getElementById("vin").selectedIndex = 0;
-  document.getElementById("tipoVehiculo").selectedIndex = 0;
-  document.getElementById("anio").selectedIndex = 0;
-  document.getElementById("motor").value = "";
+  ["vin","tipoVehiculo","anio"].forEach(id => document.getElementById(id).selectedIndex = 0);
   document.getElementById("hibrido").value = "no";
-  document.getElementById("results").innerHTML = "";
+  document.getElementById("motor").value = "";
   document.getElementById("grupoMotor").style.display = "block";
+  document.getElementById("results").innerHTML = "";
 }
-
 async function guardarHistorial(detalles, total) {
   const user = auth.currentUser;
   if (!user) return;
   try {
-    const ref = db
-      .collection("clients")
-      .doc(user.uid)
-      .collection("historial");
-    const snap = await ref.orderBy("fecha", "desc").get();
+    const ref = db.collection("clients").doc(user.uid).collection("historial");
+    const snap = await ref.orderBy("fecha","desc").get();
     if (snap.size >= 100) await ref.doc(snap.docs.pop().id).delete();
     await ref.add({
       nombre: "Sin título",
