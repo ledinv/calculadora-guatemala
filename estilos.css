@@ -203,6 +203,21 @@ select {
   box-sizing: border-box;
 }
 
+/* Campo Híbrido */
+input[type="checkbox"]#hibrido {
+  width: auto;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.hibrido-wrapper {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #002f6c;
+}
+
 .titulo {
   text-align: center;
   font-size: 1.8rem;
