@@ -18,7 +18,7 @@ const formatear = v =>
 const formatearUSD = v =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(v);
 
-// Tablas de fees (copart idénticas)
+// Tablas de fees (COPART)
 const buyerFees = [
   [50,1],[100,25],[200,60],[300,85],[350,100],[400,125],[450,135],[500,145],
   [550,155],[600,170],[700,195],[800,215],[900,230],[1000,250],[1200,270],
@@ -32,6 +32,7 @@ const virtualBidFees = [
   [100,50],[500,65],[1000,85],[1500,95],[2000,110],[4000,125],
   [6000,145],[8000,160],[9000,160],[10000,160],[200000,160]
 ];
+
 function buscarValor(tabla, valor) {
   for (let i = tabla.length - 1; i >= 0; i--) {
     if (valor >= tabla[i][0]) return tabla[i][1];
@@ -43,29 +44,29 @@ const buscarBuyerFee = c1 =>
 const buscarVirtualBidFee = c1 =>
   c1 > 8000 ? 160 : buscarValor(virtualBidFees, c1);
 
-// Mostrar la interfaz y configurar listeners
+// Mostrar el formulario y configurar listeners
 document.addEventListener("DOMContentLoaded", () => {
-  // Mostrar contenido
   document.getElementById("content").style.display = "block";
-  // Tipo de cambio y contador
   obtenerTipoCambioAutomatico();
   obtenerContador();
-  // Ocultar/mostrar motor si es híbrido
+
+  // Si existe selector de híbrido, ocultar/mostrar grupo de motor
   const hibrido = document.getElementById("hibrido");
   const grupoMotor = document.getElementById("grupoMotor");
-  function actualizarMotor() {
-    if (hibrido.value === "si") {
-      grupoMotor.style.display = "none";
-      document.getElementById("motor").value = "";
-    } else {
-      grupoMotor.style.display = "block";
+  if (hibrido && grupoMotor) {
+    function actualizarMotor() {
+      if (hibrido.value === "si") {
+        grupoMotor.style.display = "none";
+      } else {
+        grupoMotor.style.display = "block";
+      }
     }
+    hibrido.addEventListener("change", actualizarMotor);
+    actualizarMotor();
   }
-  hibrido.addEventListener("change", actualizarMotor);
-  actualizarMotor();
 });
 
-// Funciones de sesión
+// Sesión y menú
 function logout() {
   firebase.auth().signOut().then(() => location.reload());
 }
@@ -113,29 +114,36 @@ async function registrarClic() {
 function calcular() {
   registrarClic();
 
-  // Lectura de campos
+  // Obtengo los elementos con fallback a IDs antiguos
+  const getEl = (...ids) => ids.map(id => document.getElementById(id)).find(el => el != null);
+
   const c1 = parseFloat(document.getElementById("c1").value) || 0;
   const c7 = parseFloat(document.getElementById("c7").value) || 0;
   const c8 = parseFloat(document.getElementById("c8").value) || 0;
   const e2 = parseFloat(document.getElementById("e2").value) || 0;
-  const vin = document.getElementById("vin").value;
-  const tipo = document.getElementById("tipoVehiculo").value;
-  const anio = parseInt(document.getElementById("anio").value, 10);
-  const motor = document.getElementById("motor").value;
-  const esHibrido = document.getElementById("hibrido").value === "si";
+
+  const vinEl = getEl("vin", "c13");
+  const tipoEl = getEl("tipoVehiculo", "c14");
+  const anioEl = getEl("año", "anio");     // fallback
+  const hibridoEl = document.getElementById("hibrido"); // opcional
+  const motorEl = document.getElementById("motor");
+
+  if (!vinEl || !tipoEl || !anioEl) {
+    return alert("No se encontraron algunos campos en el formulario.");
+  }
+
+  const vin = vinEl.value;
+  const tipo = tipoEl.value;
+  const anio = parseInt(anioEl.value, 10);
+  const motor = motorEl ? motorEl.value : "";
+  const esHibrido = hibridoEl ? (hibridoEl.value === "si") : false;
   const usaAmnistia = anio <= 2005;
 
-  // Validaciones
-  if (
-    c1 <= 0 ||
-    c7 < 0 ||
-    c8 < 0 ||
-    e2 <= 0 ||
-    !vin ||
-    !tipo ||
-    (tipo === "TURISMO" && !esHibrido && !motor)
+  // Validación mínima
+  if (c1 <= 0 || c7 < 0 || c8 < 0 || e2 <= 0 || !vin || !tipo ||
+      (tipo === "TURISMO" && !esHibrido && !motor)
   ) {
-    return alert("Por favor completa todos los campos.");
+    return alert("Por favor completa todos los campos requeridos.");
   }
 
   // Cálculos base
@@ -152,21 +160,17 @@ function calcular() {
   const base = cifHNL + o3 + o4 + gateFee * e2;
 
   // Impuestos
-  let dai = 0,
-    isc = 0,
-    isv = 0;
+  let dai = 0, isc = 0, isv = 0;
   if (!usaAmnistia && !esHibrido) {
-    // DAI
     if (vin === "otros") {
       if (tipo === "TURISMO") {
         dai = base * (motor === "1.5 Inferior" ? 0.05 : 0.15);
-      } else if (["PICKUP", "CAMION", "MOTO"].includes(tipo)) {
+      } else if (["PICKUP", "MOTO", "CAMION"].includes(tipo)) {
         dai = base * 0.10;
       } else if (tipo === "AGRICOLA") {
         dai = base * 0.05;
       }
     }
-    // ISC exento para pick-ups, camiones y maquinaria agrícola
     if (!["PICKUP", "CAMION", "AGRICOLA"].includes(tipo)) {
       if (tipo === "MOTO") isc = base * 0.10;
       else if (cifUSD <= 7000) isc = base * 0.10;
@@ -176,7 +180,6 @@ function calcular() {
       else isc = base * 0.45;
     }
   }
-  // ISV exento para híbridos y maquinaria agrícola
   if (!esHibrido && tipo !== "AGRICOLA") {
     isv = (cifHNL + dai + isc + o3 + o4) * 0.15;
   }
@@ -191,7 +194,7 @@ function calcular() {
   const aduanero = 4000;
   const votainer = 7500;
   const transferencia = 55 * e2;
-  const matricula = !usaAmnistia && anio >= 2006 ? 4000 : 0;
+  const matricula = (!usaAmnistia && anio >= 2006) ? 4000 : 0;
   const fijoAmnistia = usaAmnistia ? 10000 : 0;
   const gastosFijos = fijoAmnistia + aduanero + votainer + transferencia + matricula + ecotasa;
 
@@ -234,10 +237,12 @@ function calcular() {
   );
 }
 
-// Renderizado de resultados
+// Renderizar resultados
 function mostrarResultados(detalles) {
   const rows = detalles
-    .map(([t, v, u]) => `<tr><td>${t}</td><td>${u === "usd" ? formatearUSD(v) : formatear(v)}</td></tr>`)
+    .map(([t, v, u]) =>
+      `<tr><td>${t}</td><td>${u === "usd" ? formatearUSD(v) : formatear(v)}</td></tr>`
+    )
     .join("");
   document.getElementById("results").innerHTML = `
     <div style="text-align:center;">
@@ -249,49 +254,61 @@ function mostrarResultados(detalles) {
       </div>
       <div id="detalleResultados" style="display:none;">
         <table class="tabla-detalles">
-          <tr><th>Concepto</th><th>Valor</th></tr>${rows}
+          <tr><th>Concepto</th><th>Valor</th></tr>
+          ${rows}
         </table>
       </div>
     </div>
   `;
 }
+
 function mostrarDetalles() {
   const det = document.getElementById("detalleResultados");
   const btn = document.getElementById("toggleBtn");
-  const visible = det.style.display === "block";
-  det.style.display = visible ? "none" : "block";
-  btn.textContent = visible ? "Ver detalles" : "Ocultar detalles";
+  const mostrar = det.style.display === "block";
+  det.style.display = mostrar ? "none" : "block";
+  btn.textContent = mostrar ? "Ver detalles" : "Ocultar detalles";
 }
+
 function descargarPDF() {
   mostrarDetalles();
-  const content = document.getElementById("results").innerHTML;
+  const contenido = document.getElementById("results").innerHTML;
   const w = window.open("", "_blank", "width=800,height=600");
   w.document.write(`<html><head><title>PDF</title><style>
     body{font-family:Helvetica;margin:20px;}
     .tabla-detalles{margin:20px auto;border-collapse:collapse;width:100%;max-width:600px;}
     .tabla-detalles th,.tabla-detalles td{padding:8px 12px;border:1px solid #ddd;}
     .tabla-detalles th{background:#f2f2f2;}
-  </style></head><body>${content}</body></html>`);
+  </style></head><body>${contenido}</body></html>`);
   w.document.close();
   setTimeout(() => w.print(), 500);
 }
+
 function compartirWhatsApp() {
-  let text = "¡Hola! Aquí tu cálculo de importación:\n\n";
-  document.querySelectorAll("#detalleResultados table tr").forEach(row => {
-    const cols = row.querySelectorAll("td,th");
-    if (cols.length === 2) text += `${cols[0].innerText}: ${cols[1].innerText}\n`;
+  let msg = "¡Hola! Cálculo de importación:\n\n";
+  document.querySelectorAll("#detalleResultados table tr").forEach(r => {
+    const c = r.querySelectorAll("td,th");
+    if (c.length === 2) msg += `${c[0].innerText}: ${c[1].innerText}\n`;
   });
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
 }
+
 function reiniciar() {
   ["c1","c7","c8"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("e2").value = "25.90";
-  ["vin","tipoVehiculo","anio"].forEach(id => document.getElementById(id).selectedIndex = 0);
-  document.getElementById("hibrido").value = "no";
-  document.getElementById("motor").value = "";
-  document.getElementById("grupoMotor").style.display = "block";
+  ["vin","c13","tipoVehiculo","c14","año","anio"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.tagName === "SELECT") el.selectedIndex = 0;
+  });
+  const h = document.getElementById("hibrido");
+  if (h) h.selectedIndex = 0;
+  const m = document.getElementById("motor");
+  if (m) m.value = "";
+  const gm = document.getElementById("grupoMotor");
+  if (gm) gm.style.display = "block";
   document.getElementById("results").innerHTML = "";
 }
+
 async function guardarHistorial(detalles, total) {
   const user = auth.currentUser;
   if (!user) return;
