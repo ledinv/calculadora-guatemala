@@ -83,7 +83,7 @@
         <option value="TURISMO">Turismo</option>
         <option value="PICKUP">Pick-Up</option>
         <option value="MOTO">Motocicleta</option>
-        <option value="CAMION">Camíon</option>
+        <option value="CAMION">Camión</option>
         <option value="AGRICOLA">Maquinaria Agrícola</option>
       </select>
 
@@ -112,8 +112,44 @@
       <button class="styled-btn" onclick="reiniciar()">Reiniciar</button>
     </div>
 
-    <div class="banner derecha">
-      <img src="https://raw.githubusercontent.com/ledinv/calculadora-subastacarhn/main/lateral%20derecho.jpg" alt="Banner Derecho">
+    <!-- Buscador de grúas -->
+    <div id="buscador-gruas" class="formulario-box">
+      <h3 style="margin-bottom: 10px;">Busca el precio de tu grúa</h3>
+
+      <label for="ciudadInput">Ciudad:</label>
+      <input type="text" id="ciudadInput" placeholder="Escribe la ciudad..." autocomplete="off" />
+
+      <label for="vehiculoSelect">Tipo de vehículo:</label>
+      <select id="vehiculoSelect">
+        <option value="">Selecciona tipo de vehículo</option>
+        <option>Turismos Pequeños</option>
+        <option>Turismos Grande</option>
+        <option>Camionetas Regulares</option>
+        <option>Camionetas Grandes</option>
+        <option>Camionetas XL</option>
+        <option>Motos Regulares</option>
+        <option>Marcas Exclusivas</option>
+        <option>Cabina Sencilla (no excediendo 16')</option>
+        <option>Cabina y Media (baja)</option>
+        <option>Cabina y Media (alto) y doble cabina</option>
+        <option>Extra Grandes (más de 17'3'')</option>
+        <option>Pick Up’s / Vehículos Extra-Dimensionados</option>
+      </select>
+
+      <button onclick="buscarRutaMasEconomica()">Buscar ruta más económica</button>
+
+      <div id="resultadoGrua" style="margin-top: 10px; display: none;">
+        <p id="precioBarco"></p>
+        <p id="precioGrua"></p>
+      </div>
+
+      <div id="mensajeError" style="margin-top: 10px; color: red; display: none;">
+        ❌ No hay datos para esa combinación. Por favor consulte directamente con su naviera.
+      </div>
+
+      <p style="font-size: 0.85rem; margin-top: 10px; color: #666;">
+        ⚠️ Estos precios son <strong>referenciales</strong>. Consulte con su naviera para valores exactos.
+      </p>
     </div>
   </div>
 
@@ -146,7 +182,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-<!-- Script principal -->
+<!-- Scripts -->
 <script src="script.js"></script>
+<script src="gruas.js"></script>
 </body>
 </html>
