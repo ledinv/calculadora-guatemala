@@ -1,7 +1,7 @@
-const dataGruas = [
-  {
-    ciudad: "Miami",
-    vehiculos: {
+// Datos organizados por estado > ciudad > tipo de vehículo
+const dataGruas = {
+  Florida: {
+    "Miami": {
       "Turismos Pequeños": { barco: 780, grua: 80 },
       "Turismos Grande": { barco: 970, grua: 80 },
       "Camionetas Regulares": { barco: 795, grua: 80 },
@@ -15,9 +15,8 @@ const dataGruas = [
       "Extra Grandes (más de 17'3'')": { barco: 1750, grua: 80 }
     }
   },
-  {
-    ciudad: "Houston",
-    vehiculos: {
+  Texas: {
+    "Houston": {
       "Turismos Pequeños": { barco: 800, grua: 100 },
       "Turismos Grande": { barco: 980, grua: 100 },
       "Camionetas Regulares": { barco: 950, grua: 100 },
@@ -31,9 +30,8 @@ const dataGruas = [
       "Extra Grandes (más de 17'3'')": { barco: 1775, grua: 100 }
     }
   },
-  {
-    ciudad: "Delaware",
-    vehiculos: {
+  Delaware: {
+    "New Castle": {
       "Turismos Pequeños": { barco: 850, grua: 80 },
       "Turismos Grande": { barco: 950, grua: 80 },
       "Camionetas Regulares": { barco: 950, grua: 80 },
@@ -47,26 +45,55 @@ const dataGruas = [
       "Extra Grandes (más de 17'3'')": { barco: 1780, grua: 80 }
     }
   }
-];
+};
 
+// Llena el select de ciudad según el estado
+function cargarCiudades() {
+  const estado = document.getElementById("estadoSelect").value;
+  const ciudadSelect = document.getElementById("ciudadSelect");
+
+  ciudadSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
+
+  if (estado && dataGruas[estado]) {
+    const ciudades = Object.keys(dataGruas[estado]);
+    ciudades.forEach(ciudad => {
+      const option = document.createElement("option");
+      option.value = ciudad;
+      option.textContent = ciudad;
+      ciudadSelect.appendChild(option);
+    });
+  }
+}
+
+// Busca los precios según estado + ciudad + tipo de vehículo
 function buscarRutaMasEconomica() {
-  const ciudadInput = document.getElementById("ciudadInput").value.trim().toLowerCase();
-  const tipoVehiculo = document.getElementById("vehiculoSelect").value;
-
-  const resultado = dataGruas.find(item =>
-    item.ciudad.toLowerCase().includes(ciudadInput) &&
-    item.vehiculos[tipoVehiculo]
-  );
+  const estado = document.getElementById("estadoSelect").value;
+  const ciudad = document.getElementById("ciudadSelect").value;
+  const tipo = document.getElementById("vehiculoSelect").value;
 
   const resultadoDiv = document.getElementById("resultadoGrua");
   const errorDiv = document.getElementById("mensajeError");
   const barcoText = document.getElementById("precioBarco");
   const gruaText = document.getElementById("precioGrua");
 
-  if (resultado) {
-    const datos = resultado.vehiculos[tipoVehiculo];
-    barcoText.innerHTML = `🚢 <strong>Barco:</strong> USD ${datos.barco}`;
-    gruaText.innerHTML = `🏗️ <strong>Grúa:</strong> USD ${datos.grua}`;
+  if (
+    estado &&
+    ciudad &&
+    tipo &&
+    dataGruas[estado] &&
+    dataGruas[estado][ciudad] &&
+    dataGruas[estado][ciudad][tipo]
+  ) {
+    const datos = dataGruas[estado][ciudad][tipo];
+    let barco = 0;
+
+    // Asignar barco por puerto principal del estado
+    if (estado === "Florida") barco = 780;
+    else if (estado === "Texas") barco = 800;
+    else if (estado === "Delaware") barco = 850;
+
+    barcoText.innerHTML = `🚢 <strong>Barco (desde ${estado}):</strong> USD ${barco}`;
+    gruaText.innerHTML = `🏗️ <strong>Grúa (desde ${ciudad}):</strong> USD ${datos.grua}`;
     resultadoDiv.style.display = "block";
     errorDiv.style.display = "none";
   } else {
