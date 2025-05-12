@@ -297,3 +297,66 @@ input[type="checkbox"]#hibrido {
     display: none !important;
   }
 }
+/* Estilo para el bloque del buscador de grúas */
+#buscador-gruas {
+  max-width: 380px;
+  width: 100%;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+#buscador-gruas h3 {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--blue2);
+  font-weight: 700;
+}
+
+#buscador-gruas label {
+  display: block;
+  margin-top: 10px;
+  color: var(--blue);
+  font-weight: bold;
+}
+
+#buscador-gruas input,
+#buscador-gruas select {
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--blue2);
+  background: #f0f8ff;
+  width: 100%;
+  margin-top: 5px;
+}
+
+#buscador-gruas button {
+  margin-top: 15px;
+  width: 100%;
+  background-color: var(--yellow);
+  color: var(--blue);
+  font-weight: bold;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#buscador-gruas button:hover {
+  background-color: #e6ac00;
+}
+
+#resultadoGrua p {
+  font-size: 0.95rem;
+  margin: 5px 0;
+  font-weight: bold;
+  color: var(--blue);
+}
+
+#mensajeError {
+  font-size: 0.9rem;
+  text-align: center;
+}
