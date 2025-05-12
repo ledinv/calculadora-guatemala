@@ -113,35 +113,57 @@
     </div>
 
     <!-- Buscador de grúas -->
-    <div id="buscador-gruas" class="formulario-box">
-      <h3 style="margin-bottom: 10px;">Busca el precio de tu grúa</h3>
+    <!-- Buscador de grúas con estado y ciudad -->
+<div id="buscador-gruas" class="formulario-box">
+  <h3 style="margin-bottom: 10px;">Busca el precio de tu grúa</h3>
 
-      <label for="ciudadInput">Ciudad:</label>
-      <input type="text" id="ciudadInput" placeholder="Escribe la ciudad..." autocomplete="off" />
+  <label for="estadoSelect">Estado:</label>
+  <select id="estadoSelect" onchange="cargarCiudades()">
+    <option value="">Selecciona un estado</option>
+    <option value="Florida">Florida</option>
+    <option value="Texas">Texas</option>
+    <option value="Delaware">Delaware</option>
+    <!-- Puedes agregar más estados aquí -->
+  </select>
 
-      <label for="vehiculoSelect">Tipo de vehículo:</label>
-      <select id="vehiculoSelect">
-        <option value="">Selecciona tipo de vehículo</option>
-        <option>Turismos Pequeños</option>
-        <option>Turismos Grande</option>
-        <option>Camionetas Regulares</option>
-        <option>Camionetas Grandes</option>
-        <option>Camionetas XL</option>
-        <option>Motos Regulares</option>
-        <option>Marcas Exclusivas</option>
-        <option>Cabina Sencilla (no excediendo 16')</option>
-        <option>Cabina y Media (baja)</option>
-        <option>Cabina y Media (alto) y doble cabina</option>
-        <option>Extra Grandes (más de 17'3'')</option>
-        <option>Pick Up’s / Vehículos Extra-Dimensionados</option>
-      </select>
+  <label for="ciudadSelect">Ciudad:</label>
+  <select id="ciudadSelect">
+    <option value="">Selecciona una ciudad</option>
+  </select>
 
-      <button onclick="buscarRutaMasEconomica()">Buscar ruta más económica</button>
+  <label for="vehiculoSelect">Tipo de vehículo:</label>
+  <select id="vehiculoSelect">
+    <option value="">Selecciona tipo de vehículo</option>
+    <option>Turismos Pequeños</option>
+    <option>Turismos Grande</option>
+    <option>Camionetas Regulares</option>
+    <option>Camionetas Grandes</option>
+    <option>Camionetas XL</option>
+    <option>Motos Regulares</option>
+    <option>Marcas Exclusivas</option>
+    <option>Cabina Sencilla (no excediendo 16')</option>
+    <option>Cabina y Media (baja)</option>
+    <option>Cabina y Media (alto) y doble cabina</option>
+    <option>Extra Grandes (más de 17'3'')</option>
+    <option>Pick Up’s / Vehículos Extra-Dimensionados</option>
+  </select>
 
-      <div id="resultadoGrua" style="margin-top: 10px; display: none;">
-        <p id="precioBarco"></p>
-        <p id="precioGrua"></p>
-      </div>
+  <button onclick="buscarRutaMasEconomica()">Buscar ruta más económica</button>
+
+  <div id="resultadoGrua" style="margin-top: 10px; display: none;">
+    <p id="precioBarco"></p>
+    <p id="precioGrua"></p>
+  </div>
+
+  <div id="mensajeError" style="margin-top: 10px; color: red; display: none;">
+    ❌ No hay datos para esa combinación. Por favor consulte directamente con su naviera.
+  </div>
+
+  <p style="font-size: 0.85rem; margin-top: 10px; color: #666;">
+    ⚠️ Estos precios son <strong>referenciales</strong>. Consulte con su naviera para valores exactos.
+  </p>
+</div>
+
 
       <div id="mensajeError" style="margin-top: 10px; color: red; display: none;">
         ❌ No hay datos para esa combinación. Por favor consulte directamente con su naviera.
