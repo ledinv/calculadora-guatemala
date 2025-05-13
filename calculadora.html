@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="estilos.css">
 </head>
 
-<body>
+<body onload="cargarEstados();">
 
 <header class="site-header">
   <div class="container header-inner">
@@ -43,11 +43,8 @@
   </ul>
 </header>
 
-<!-- CONTENIDO PRINCIPAL -->
 <div id="content" style="display:none;">
-
   <h1 class="titulo">Calculadora de Importación de Vehículos</h1>
-
   <p class="soporte">
     ¿Necesitás ayuda? <a href="https://wa.me/50497330137" target="_blank">Soporte gratuito</a> al
     <span style="color:green;">+504 9733-0137</span>
@@ -58,7 +55,6 @@
       <img src="https://raw.githubusercontent.com/ledinv/calculadora-subastacarhn/main/lateral%20izquierdo.jpeg" alt="Banner Izquierdo">
     </div>
 
-    <!-- FORMULARIO -->
     <div class="contenido-central">
       <label for="c1">Monto de Oferta $:</label>
       <input type="number" id="c1" />
@@ -112,58 +108,42 @@
       <button class="styled-btn" onclick="reiniciar()">Reiniciar</button>
     </div>
 
-    <!-- Buscador de grúas -->
-    <!-- Buscador de grúas con estado y ciudad -->
-<div id="buscador-gruas" class="formulario-box">
-  <h3 style="margin-bottom: 10px;">Busca el precio de tu grúa</h3>
+    <div id="buscador-gruas" class="formulario-box">
+      <h3 style="margin-bottom: 10px;">Busca el precio de tu grúa</h3>
 
-  <label for="estadoSelect">Estado:</label>
-  <select id="estadoSelect" onchange="cargarCiudades()">
-    <option value="">Selecciona un estado</option>
-    <option value="Florida">Florida</option>
-    <option value="Texas">Texas</option>
-    <option value="Delaware">Delaware</option>
-    <!-- Puedes agregar más estados aquí -->
-  </select>
+      <label for="estadoSelect">Estado:</label>
+      <select id="estadoSelect" onchange="cargarCiudades()">
+        <option value="">Selecciona un estado</option>
+      </select>
 
-  <label for="ciudadSelect">Ciudad:</label>
-  <select id="ciudadSelect">
-    <option value="">Selecciona una ciudad</option>
-  </select>
+      <label for="ciudadSelect">Ciudad:</label>
+      <select id="ciudadSelect">
+        <option value="">Selecciona una ciudad</option>
+      </select>
 
-  <label for="vehiculoSelect">Tipo de vehículo:</label>
-  <select id="vehiculoSelect">
-    <option value="">Selecciona tipo de vehículo</option>
-    <option>Turismos Pequeños</option>
-    <option>Turismos Grande</option>
-    <option>Camionetas Regulares</option>
-    <option>Camionetas Grandes</option>
-    <option>Camionetas XL</option>
-    <option>Motos Regulares</option>
-    <option>Marcas Exclusivas</option>
-    <option>Cabina Sencilla (no excediendo 16')</option>
-    <option>Cabina y Media (baja)</option>
-    <option>Cabina y Media (alto) y doble cabina</option>
-    <option>Extra Grandes (más de 17'3'')</option>
-    <option>Pick Up’s / Vehículos Extra-Dimensionados</option>
-  </select>
+      <label for="vehiculoSelect">Tipo de vehículo:</label>
+      <select id="vehiculoSelect">
+        <option value="">Selecciona tipo de vehículo</option>
+        <option>Turismos Pequeños</option>
+        <option>Turismos Grande</option>
+        <option>Camionetas Regulares</option>
+        <option>Camionetas Grandes</option>
+        <option>Camionetas XL</option>
+        <option>Motos Regulares</option>
+        <option>Marcas Exclusivas</option>
+        <option>Cabina Sencilla (no excediendo 16')</option>
+        <option>Cabina y Media (baja)</option>
+        <option>Cabina y Media (alto) y doble cabina</option>
+        <option>Extra Grandes (más de 17'3'')</option>
+        <option>Pick Up’s / Vehículos Extra-Dimensionados</option>
+      </select>
 
-  <button onclick="buscarRuta()">Buscar precios</button>
+      <button onclick="buscarRuta()">Buscar precios</button>
 
-  <div id="resultadoGrua" style="margin-top: 10px; display: none;">
-    <p id="precioBarco"></p>
-    <p id="precioGrua"></p>
-  </div>
-
-  <div id="mensajeError" style="margin-top: 10px; color: red; display: none;">
-    ❌ No hay datos para esa combinación. Por favor consulte directamente con su naviera.
-  </div>
-
-  <p style="font-size: 0.85rem; margin-top: 10px; color: #666;">
-    ⚠️ Estos precios son <strong>referenciales</strong>. Consulte con su naviera para valores exactos.
-  </p>
-</div>
-
+      <div id="resultadoGrua" style="margin-top: 10px; display: none;">
+        <p id="precioBarco"></p>
+        <p id="precioGrua"></p>
+      </div>
 
       <div id="mensajeError" style="margin-top: 10px; color: red; display: none;">
         ❌ No hay datos para esa combinación. Por favor consulte directamente con su naviera.
@@ -176,7 +156,6 @@
   </div>
 
   <div id="results"></div>
-
   <a href="https://wa.me/50497330137" class="soporte-gratis" target="_blank">Cotízalo ya</a>
 </div>
 
