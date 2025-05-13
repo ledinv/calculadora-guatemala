@@ -362,6 +362,7 @@
 <!-- /CONTENIDO PRINCIPAL -->
 <!-- Firebase SDKs para autenticación -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
@@ -379,24 +380,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Protección de sesión
-//auth.onAuthStateChanged(user => {
-  //const desktop = document.getElementById('userGreeting');
-  //const mobile  = document.getElementById('mobileGreeting');
-  //if (user) {
-    //document.getElementById('content').style.display = 'block';
-    //const name = (user.displayName || user.email.split('@')[0])
-                   //.replace(/^./, c => c.toUpperCase());
-    //desktop.innerHTML = `<a href="perfil.html">Hola, ${name}</a> | <a href="#" onclick="logout()">Cerrar sesión</a>`;
-    //mobile.innerHTML = `<a href="perfil.html">Hola, ${name}</a> | <a href="#" onclick="logout()">Salir</a>`;
-  //} else {
-    //document.getElementById('content').style.display = 'none';
-    //desktop.innerHTML = `<a href="login.html">Iniciar sesión</a> | <a href="register.html">Registrarse</a>`;
-    //mobile.innerHTML = desktop.innerHTML;
-    //alert('❗ Debes iniciar sesión para usar la calculadora.');
-    //window.location.href = 'login.html';
-  //}
-//});
 
 function logout() {
   firebase.auth().signOut().then(() => location.reload());
