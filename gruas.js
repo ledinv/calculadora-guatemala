@@ -369,6 +369,7 @@ const tarifarioGruasPuertoFlorida = {
     "Orono": 825.00
   }
 };
+// DATOS DE BARCOS SEGÚN TIPO DE VEHÍCULO (NO TOCAR)
 const dataGruas = {
   Florida: {
     "Miami": {
@@ -416,6 +417,25 @@ const dataGruas = {
     }
   }
 };
+
+// LLENAR SELECT DE ESTADOS (extraído dinámicamente de todos los tarifarios)
+function cargarEstados() {
+  const estadoSelect = document.getElementById("estadoSelect");
+  estadoSelect.innerHTML = '<option value="">Selecciona un estado</option>';
+
+  const estados = new Set();
+  [tarifarioGruasPuertoFlorida, tarifarioGruasPuertoTexas, tarifarioGruasPuertoDelaware].forEach(tarifario => {
+    Object.keys(tarifario).forEach(estado => estados.add(estado));
+  });
+
+  [...estados].sort().forEach(estado => {
+    const option = document.createElement("option");
+    option.value = estado;
+    option.textContent = estado;
+    estadoSelect.appendChild(option);
+  });
+}
+// LLENAR SELECT DE CIUDADES SEGÚN EL ESTADO SELECCIONADO
 function cargarCiudades() {
   const estado = document.getElementById("estadoSelect").value;
   const ciudadSelect = document.getElementById("ciudadSelect");
@@ -423,19 +443,11 @@ function cargarCiudades() {
 
   const ciudades = new Set();
 
-  if (estado === "Florida") {
-    Object.values(tarifarioGruasPuertoFlorida).forEach(ciudadesObj => {
-      Object.keys(ciudadesObj).forEach(c => ciudades.add(c));
-    });
-  } else if (estado === "Texas") {
-    Object.values(tarifarioGruasPuertoTexas).forEach(ciudadesObj => {
-      Object.keys(ciudadesObj).forEach(c => ciudades.add(c));
-    });
-  } else if (estado === "Delaware") {
-    Object.values(tarifarioGruasPuertoDelaware).forEach(ciudadesObj => {
-      Object.keys(ciudadesObj).forEach(c => ciudades.add(c));
-    });
-  }
+  [tarifarioGruasPuertoFlorida, tarifarioGruasPuertoTexas, tarifarioGruasPuertoDelaware].forEach(tarifario => {
+    if (tarifario[estado]) {
+      Object.keys(tarifario[estado]).forEach(ciudad => ciudades.add(ciudad));
+    }
+  });
 
   [...ciudades].sort().forEach(ciudad => {
     const option = document.createElement("option");
@@ -444,6 +456,7 @@ function cargarCiudades() {
     ciudadSelect.appendChild(option);
   });
 }
+// MUESTRA PRECIO DE BARCO Y GRÚA SEGÚN ESTADO + CIUDAD + TIPO
 function buscarRuta() {
   const estadoSeleccionado = document.getElementById("estadoSelect").value;
   const ciudad = document.getElementById("ciudadSelect").value;
@@ -459,34 +472,32 @@ function buscarRuta() {
   let encontrado = false;
 
   const puertos = [
-    { nombre: "Florida", data: tarifarioGruasPuertoFlorida },
-    { nombre: "Texas", data: tarifarioGruasPuertoTexas },
-    { nombre: "Delaware", data: tarifarioGruasPuertoDelaware }
+    { nombre: "Florida", data: tarifarioGruasPuertoFlorida, ciudadBase: "Miami" },
+    { nombre: "Texas", data: tarifarioGruasPuertoTexas, ciudadBase: "Houston" },
+    { nombre: "Delaware", data: tarifarioGruasPuertoDelaware, ciudadBase: "New Castle" }
   ];
 
   puertos.forEach(puerto => {
-    Object.keys(puerto.data).forEach(estado => {
-      const ciudades = puerto.data[estado];
-      if (ciudades[ciudad]) {
-        // Precio de barco desde dataGruas según tipo
-        let barco = null;
-let ciudadBase = "";
+    const tarifario = puerto.data;
+    const baseCiudad = puerto.ciudadBase;
+    const nombrePuerto = puerto.nombre;
 
-if (puerto.nombre === "Florida") ciudadBase = "Miami";
-else if (puerto.nombre === "Texas") ciudadBase = "Houston";
-else if (puerto.nombre === "Delaware") ciudadBase = "New Castle";
+    if (tarifario[estadoSeleccionado] && tarifario[estadoSeleccionado][ciudad]) {
+      const valorGrua = tarifario[estadoSeleccionado][ciudad];
 
-if (dataGruas[puerto.nombre] && dataGruas[puerto.nombre][ciudadBase] && dataGruas[puerto.nombre][ciudadBase][tipo]) {
-  barco = dataGruas[puerto.nombre][ciudadBase][tipo].barco;
-}
-
-
-        const valorGrua = ciudades[ciudad];
-        htmlBarco += `🚢 <strong>Barco (${puerto.nombre}):</strong> USD ${barco || 'N/D'}<br>`;
-        htmlGrua += `🏗️ <strong>Grúa (${ciudad}):</strong> USD ${valorGrua}<br>`;
-        encontrado = true;
+      let barco = null;
+      if (
+        dataGruas[nombrePuerto] &&
+        dataGruas[nombrePuerto][baseCiudad] &&
+        dataGruas[nombrePuerto][baseCiudad][tipo]
+      ) {
+        barco = dataGruas[nombrePuerto][baseCiudad][tipo].barco;
       }
-    });
+
+      htmlBarco += `🚢 <strong>Barco (${nombrePuerto}):</strong> USD ${barco || 'N/D'}<br>`;
+      htmlGrua += `🏗️ <strong>Grúa (${ciudad} - ${nombrePuerto}):</strong> USD ${valorGrua}<br>`;
+      encontrado = true;
+    }
   });
 
   if (encontrado) {
