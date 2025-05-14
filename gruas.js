@@ -1,6 +1,12 @@
 const tarifarioGruasPuertoFlorida = {
   "Alabama": {
-    "Birmingham": 475.00
+    "Birmingham": 475.00,
+    "DOTHAN - IAAI": 475.00,
+    "HUNTSVILLE": 475.00,
+    "TANNER": 475.00,
+    "MOBILE ": 475.00,
+    "MONTGOMERY": 475.00
+    
   },
   "Arizona": {
     "Phoenix": 1000.00,
@@ -12,7 +18,6 @@ const tarifarioGruasPuertoFlorida = {
   },
   "Connecticut": {
     "Hartford": 900.00,
-    "Bridgeport": 750.00
   },
   "Florida": {
     "Ft. Lauderdale": 70.00,
@@ -42,15 +47,23 @@ const tarifarioGruasPuertoFlorida = {
     "Atlanta South": 350.00,
     "Atlanta West": 350.00,
     "Augusta": 500.00,
-    "Cartersville - Sublot": 375.00
+    "Cartersville - Sublot": 375.00,
+  "Tifton": 350.00,
+  "Fairburn": 400.00,
+  "Savanna": 350.00,
+    "Macon": 375.00
   },
   "Illinois": {
     "Chicago": 750.00,
     "Cicero": 750.00
   },
   "Indiana": {
-    "Indianapolis": 675.00,
-    "Indianapolis Sublote": 750.00
+    "HAMMOND ": 750.00,
+    "Indianapolis Sublote": 750.00,
+    "Cicero": 750.00,
+    "Dyer": 850.00,
+    "South bend": 850.00,
+    "Ft Wayne": 850.00,
   },
   "Iowa": {
     "Cedar Rapids": 900.00,
@@ -90,6 +103,17 @@ const tarifarioGruasPuertoFlorida = {
   "Mississippi": {
     "Jackson": 600.00
   },
+  "California": {
+    "Fresno": 1400.00,
+    "Los Angeles": 1400.00,
+    "Martinez": 1400.00,
+    "Sacramento": 1400.00,
+    "S.Bernardino": 1400.00,
+    "San Diego": 1400.00,
+    "San Jose": 1400.00,
+    "Sun valley": 1400.00,
+    "Van Nuys": 1400.00
+    
   "Missouri": {
     "Kansas City": 850.00,
     "St. Louis": 875.00
