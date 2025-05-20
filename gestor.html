@@ -1,63 +1,78 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestor de Búsqueda de Vehículos</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Buscar Vehículo en Copart + Cotización SubastaCarHN</h1>
+// === script.js ===
 
-    <form id="formularioBusqueda">
-      <label for="anioInicio">Año desde:</label>
-      <select id="anioInicio" name="anioInicio" required></select>
+document.addEventListener('DOMContentLoaded', async () => {
+  // Llenar select de años automáticamente
+  const anioInicio = document.getElementById("anioInicio");
+  const anioFin = document.getElementById("anioFin");
+  for (let y = 2000; y <= new Date().getFullYear() + 1; y++) {
+    anioInicio.innerHTML += `<option value="${y}">${y}</option>`;
+    anioFin.innerHTML += `<option value="${y}">${y}</option>`;
+  }
+  anioInicio.value = 2015;
+  anioFin.value = 2026;
 
-      <label for="anioFin">Año hasta:</label>
-      <select id="anioFin" name="anioFin" required></select>
+  const marcaSelect = document.getElementById('marca');
+  const modeloSelect = document.getElementById('modelo');
 
-      <label for="marca">Marca:</label>
-      <input type="text" id="marca" name="marca" required>
+  // Cargar marcas desde archivo JSON
+  try {
+    const marcasRes = await fetch('marcas-copart.json');
+    const marcas = await marcasRes.json();
 
-      <label for="modelo">Modelo:</label>
-      <input type="text" id="modelo" name="modelo" required>
+    marcas.forEach(marca => {
+      const option = document.createElement('option');
+      option.value = marca;
+      option.textContent = marca;
+      marcaSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error('Error cargando marcas:', err);
+  }
 
-      <label for="tipoVehiculoCopart">Tipo de Vehículo (Impuestos):</label>
-      <select id="tipoVehiculoCopart" name="tipoVehiculoCopart" required>
-        <option value="TURISMO / CAMIONETAS">TURISMO / CAMIONETAS</option>
-        <option value="PICK UP">PICK UP</option>
-        <option value="HIBRIDO">HIBRIDO</option>
-        <option value="CAMION">CAMION</option>
-        <option value="BUS">BUS</option>
-        <option value="MAQUINARIA">MAQUINARIA</option>
-        <option value="MOTO">MOTO</option>
-      </select>
+  // Al seleccionar una marca, cargar modelos
+  marcaSelect.addEventListener('change', async () => {
+    modeloSelect.innerHTML = '<option value="">Cargando modelos...</option>';
+    try {
+      const modelosRes = await fetch('modelos-copart.json');
+      const modelosData = await modelosRes.json();
+      const modelos = modelosData[marcaSelect.value] || [];
+      modeloSelect.innerHTML = '';
+      modelos.forEach(modelo => {
+        const option = document.createElement('option');
+        option.value = modelo;
+        option.textContent = modelo;
+        modeloSelect.appendChild(option);
+      });
+      if (modelos.length === 0) {
+        modeloSelect.innerHTML = '<option value="">(Sin modelos disponibles)</option>';
+      }
+    } catch (err) {
+      console.error('Error cargando modelos:', err);
+      modeloSelect.innerHTML = '<option value="">Error al cargar</option>';
+    }
+  });
 
-      <label for="tipoVehiculoBarco">Tipo de Vehículo (Barco y Grúa):</label>
-      <select id="tipoVehiculoBarco" name="tipoVehiculoBarco" required>
-        <option value="Turismos Pequeños">Turismos Pequeños</option>
-        <option value="Turismos Grande">Turismos Grande</option>
-        <option value="Camionetas Regulares">Camionetas Regulares</option>
-        <option value="Camionetas Grandes">Camionetas Grandes</option>
-        <option value="Camionetas XL">Camionetas XL</option>
-        <option value="Motos Regulares">Motos Regulares</option>
-        <option value="Marcas Exclusivas">Marcas Exclusivas</option>
-        <option value="Cabina Sencilla">Cabina Sencilla</option>
-        <option value="Cabina y Media (baja)">Cabina y Media (baja)</option>
-        <option value="Cabina y Media (alto)">Cabina y Media (alto)</option>
-        <option value="Extra Grandes">Extra Grandes</option>
-      </select>
+  const formulario = document.getElementById('formularioBusqueda');
 
-      <label for="precioDeseado">Precio deseado en Honduras (Lempiras):</label>
-      <input type="number" id="precioDeseado" name="precioDeseado" required>
+  formulario.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      <button type="submit">Buscar Vehículos</button>
-    </form>
+    const datosBusqueda = {
+      anioInicio: anioInicio.value,
+      anioFin: anioFin.value,
+      marca: marcaSelect.value,
+      modelo: modeloSelect.value,
+      tipoVehiculoCopart: document.getElementById('tipoVehiculoCopart').value,
+      tipoVehiculoBarco: document.getElementById('tipoVehiculoBarco').value,
+      precioDeseado: parseFloat(document.getElementById('precioDeseado').value)
+    };
 
-    <div id="resultados"></div>
-  </div>
+    console.log('Datos de búsqueda capturados:', datosBusqueda);
 
-  <script src="script.js"></script>
-</body>
-</html>
+    document.getElementById('resultados').innerHTML = `
+      <p>Buscando <strong>${datosBusqueda.marca} ${datosBusqueda.modelo}</strong> (${datosBusqueda.anioInicio} - ${datosBusqueda.anioFin})...<br>
+      Tipo Vehículo: ${datosBusqueda.tipoVehiculoCopart} / ${datosBusqueda.tipoVehiculoBarco}<br>
+      Precio meta: L. ${datosBusqueda.precioDeseado.toLocaleString()}</p>
+    `;
+  });
+});
